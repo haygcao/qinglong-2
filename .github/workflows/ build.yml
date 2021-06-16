@@ -1,0 +1,33 @@
+name: build static
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '14'
+      
+      - name: build front and back
+        run: |
+          yarn install
+          yarn build
+          yarn build-back
+        
+      - name: copy to static repo
+        env: 
+          GITHUB_REPO: github.com/strawferry/qinglong-static
+        run: |
+          mkdir -p static
+          cd ./static 
+          cp -rf ../dist ./ && cp -rf ../build ./
+          git init && git add .
+          git config user.name "ferryvip"
+          git config user.email "ferryvip@163.com"
+          git commit --allow-empty -m "copy static at $(date +'%Y-%m-%d %H:%M:%S')"
+          git push --force --quiet "https://strawferry:${{ secrets.API_TOKEN }}@${GITHUB_REPO}.git" master:master
