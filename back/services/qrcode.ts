@@ -84,7 +84,7 @@ export default class QRCodeService {
           }
           let timeStamp = (new Date()).getTime()
           let url = 'https://plogin.m.jd.com/cgi-bin/m/tmauthreflogurl?s_token=' + this.s_token + '&v=' + timeStamp + '&remember=true'
-          const response = await got.post(url, {
+          const response: any = await got.post(url, {
               responseType: 'json',
               json: {
                   'lang': 'chs',
@@ -141,7 +141,7 @@ export default class QRCodeService {
         return response;
     } catch (error) {
         console.log(error.response.body);
-        let res = {}
+        let res: any  = {}
         res.body = { check_ip: 0, errcode: 222, message: '出错' }
         res.headers = {}
         return res;
@@ -154,7 +154,7 @@ export default class QRCodeService {
     return qrurl;
   }
   public async status() {
-    const cookie = await this.checkLogin();
+    const cookie: any  = await this.checkLogin();
     if (cookie.body.errcode == 0) {
         let ucookie = this.getCookie(cookie);
         return { err: 0, cookie: ucookie };
