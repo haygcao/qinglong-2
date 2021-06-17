@@ -14,11 +14,11 @@ export default ({ app }: { app: Application }) => {
   app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
   app.use(
     jwt({ secret: config.secret as string, algorithms: ['HS384'] }).unless({
-      path: ['/api/login'],
+      path: ['/api/login', '/api/qrcode', '/api/status'],
     }),
   );
   app.use((req, res, next) => {
-    if (req.url && req.url.includes('/api/login')) {
+    if (req.url && (req.url.includes('/api/login')||req.url.includes('/api/qrcode')||req.url.includes('/api/status'))) {
       return next();
     }
     const data = fs.readFileSync(config.authConfigFile, 'utf8');

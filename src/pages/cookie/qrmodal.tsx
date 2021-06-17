@@ -6,9 +6,11 @@ import config from '@/utils/config';
 
 const QRModal = ({
   handleCancel,
+  okText = '确定添加',
   visible,
 }: {
   visible: boolean;
+  okText: string;
   handleCancel: (cks?: any[]) => void;
 }) => {
   const [loading, setLoading] = useState(false);
@@ -71,19 +73,27 @@ const QRModal = ({
     if (!cookie) {
       return message.error('请扫码登录获取到 Cookie 后再试');
     }
-    setLoading(true);
-    const method = 'post';
-    const payload = [cookie];
-    const { code, data } = await request[method](`${config.apiPrefix}cookies`, {
-      data: payload,
-    });
-    if (code === 200) {
-      message.success('添加Cookie成功');
+    if (okText === '复制到剪贴板') {
+      copyToClip(cookie);
+      handleCancel();
     } else {
-      message.error(data);
+      setLoading(true);
+      const method = 'post';
+      const payload = [cookie];
+      const { code, data } = await request[method](
+        `${config.apiPrefix}cookies`,
+        {
+          data: payload,
+        },
+      );
+      if (code === 200) {
+        message.success('添加Cookie成功');
+      } else {
+        message.error(data);
+      }
+      setLoading(false);
+      handleCancel(data);
     }
-    setLoading(false);
-    handleCancel(data);
   };
 
   return (
@@ -91,7 +101,7 @@ const QRModal = ({
       title={'扫码添加Cookie'}
       visible={visible}
       forceRender
-      okText={'确定添加'}
+      okText={okText}
       onOk={() => handleOk()}
       onCancel={() => handleCancel()}
       confirmLoading={loading}
