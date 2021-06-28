@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Modal, message } from 'antd';
+import { Modal, message, Switch } from 'antd';
 import QRCode from 'qrcode.react';
 import { request } from '@/utils/http';
 import config from '@/utils/config';
@@ -15,6 +15,7 @@ const QRModal = ({
 }) => {
   const [loading, setLoading] = useState(false);
   const [show, setShow] = useState(false);
+  const [autoAdd, setAutoAdd] = useState(true);
   const [qrUrl, setQrUrl] = useState('');
   const [cookie, setCookie] = useState('');
   const timerRef = useRef();
@@ -68,6 +69,12 @@ const QRModal = ({
       clearInterval(timerRef.current);
     };
   }, []);
+  useEffect(() => {
+    if (cookie && okText !== '复制到剪贴板' && autoAdd) {
+      message.success('正在自动添加 Cookie,并关闭弹窗');
+      setTimeout(handleOk, 1000);
+    }
+  }, [cookie]);
 
   const handleOk = async () => {
     if (!cookie) {
@@ -185,6 +192,18 @@ const QRModal = ({
             }}
           >
             {cookie}
+          </div>
+        )}
+        {okText !== '复制到剪贴板' && (
+          <div style={{ marginTop: 20, fontSize: 16 }}>
+            <Switch
+              checked={autoAdd}
+              checkedChildren={'自动添加 Cookie,并关闭弹窗'}
+              unCheckedChildren={'手动添加 Cookie,后关闭弹窗'}
+              onChange={(e) => {
+                setAutoAdd(e);
+              }}
+            />
           </div>
         )}
       </div>
